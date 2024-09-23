@@ -1,3 +1,4 @@
+<html>
 <p style="text-align:justify">
 This repository contains the solution presented in the paper "A SHACL-based approach for enhancing automated compliance checking with RDF data"
 </p>
@@ -18,3 +19,4 @@ If you have Java installed, simply download all files from this repository and w
 <p style="text-align:justify">
 The SPARQL rules in the files ctDTS.ttl and VaP.ttl will be executed on the state of affairs in the file Example1.ttl and the result will be written in the file inferredABox.ttl. To run the other examples, just modify the second parameter.
 </p>
+</html>
