@@ -1,12 +1,9 @@
 <p align="justify">
-This is the GitHub repository associated with the paper "On the interplay between entailments among obligations and their violations" by Livio Robaldo, submitted to JURISIN 2025.
+This is the GitHub repository associated with the paper "A SHACL-based approach for enhancing automated compliance checking with RDF data" by Joseph Anim, Livio Robaldo, and Adam Z. Wyner.
 </p>
 
 <p align="justify">
-This repository contains the computational ontology proposed in the paper as well as all examples shown and discussed therein. This ontology extends <a href="https://github.com/liviorobaldo/conflict-tolerantDeonticTraditionalScheme">the ontology defined in this other GitHub repository</a>. Therefore,besides downloading the files from this GitHub, you must also download the file:
-</p>
-<p align="center">
-  <a href="https://github.com/liviorobaldo/conflict-tolerantDeonticTraditionalScheme/blob/main/ctDTS.ttl">https://github.com/liviorobaldo/conflict-tolerantDeonticTraditionalScheme/blob/main/ctDTS.ttl</a>
+This repository contains the SHACL-based framework presented in the paper as well as the examples discussed therein.
 </p>
 
 <p align="justify">
@@ -14,13 +11,18 @@ To re-execute the examples locally you must have Java installed. The source code
 </p>
 
 <p align="justify">
-If you have Java installed, simply download all files from this repository and write the following in the consolle:
+If you have Java installed, simply download all files from this repository and write the instruction in the consolle. To compile:
 </p>
 
 <p align="center">
-<i>java -cp .;./lib/* -Dfile.encoding=utf-8 ctDTSreasonerPlusViolationsAndPenalties<br> ctDTS.ttl VaP.ttl ./Examples/Example1.ttl inferredABox.ttl</i>
+<i>javac -cp .;./lib/* executeShapes.java</i><br>
+<i>javac -cp .;./lib/* executeRules.java</i>
 </p>
 
 <p align="justify">
-The SPARQL rules in the files ctDTS.ttl and VaP.ttl will be executed on the state of affairs in the file Example1.ttl and the result will be written in the file inferredABox.ttl. To run the other examples, just modify the second parameter.
+  To execute:
+</p>
+
+<p align="center">
+<i>java -cp .;./lib/* -Dfile.encoding=utf-8 executeRules TBox.rdf ABox.rdf rules.rdf</i>
 </p>
