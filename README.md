@@ -1,5 +1,5 @@
 <p align="justify">
-This is the GitHub repository associated with the paper "A SHACL-based approach for enhancing automated compliance checking with RDF data" by Joseph Anim, Livio Robaldo, and Adam Z. Wyner.
+This is the GitHub repository associated with the paper "<i>A SHACL-based approach for enhancing automated compliance checking with RDF data</i>" by Joseph Anim, Livio Robaldo, and Adam Z. Wyner.
 </p>
 
 <p align="justify">
