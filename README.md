@@ -24,5 +24,6 @@ If you have Java installed, simply download all files from this repository and w
 </p>
 
 <p align="center">
+<i>java -cp .;./lib/* -Dfile.encoding=utf-8 executeShapes TBox.rdf ABox.rdf shapes.rdf</i><br>
 <i>java -cp .;./lib/* -Dfile.encoding=utf-8 executeRules TBox.rdf ABox.rdf rules.rdf</i>
 </p>
