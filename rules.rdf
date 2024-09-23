@@ -1,0 +1,235 @@
+@prefix : <https://w3id.org/ontology/uslcp#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix wdt: <http://www.wikidata.org/prop/direct/>.
+@prefix ti: <http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#>.
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+
+@base <https://w3id.org/ontology/uslcpo#> .
+
+<https://w3id.org/ontology/uslcpo#> rdf:type owl:Ontology .
+
+#defines all prefixes used in at least one SHACL SPARQLRule rule.
+:PrefixesEmbeddedSPARQLRules sh:declare 
+	[sh:prefix"rdf";sh:namespace"http://www.w3.org/1999/02/22-rdf-syntax-ns#"^^xsd:anyURI],
+	[sh:prefix"rdfs";sh:namespace"http://www.w3.org/2000/01/rdf-schema#"^^xsd:anyURI],
+	[sh:prefix"owl";sh:namespace"http://www.w3.org/2002/07/owl#"^^xsd:anyURI],
+	[sh:prefix"xsd";sh:namespace"http://www.w3.org/2001/XMLSchema#"^^xsd:anyURI],
+	[sh:prefix"wdt";sh:namespace"http://www.wikidata.org/prop/direct/"^^xsd:anyURI],
+	[sh:prefix"ti";sh:namespace"http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#"^^xsd:anyURI],
+	[sh:prefix"";sh:namespace"https://w3id.org/ontology/uslcp#"^^xsd:anyURI].
+
+[rdf:type sh:NodeShape;
+
+
+#This rule checks whether a company is not compliant because it did not submit its local content plan at all.
+sh:rule[rdf:type sh:SPARQLRule; sh:order 0; sh:prefixes :PrefixesEmbeddedSPARQLRules;
+sh:construct """
+CONSTRUCT 
+{
+:NonCompliantCompany rdf:type owl:class.
+?x rdf:type :NonCompliantCompany;
+rdfs:comment "This oil company or service provider is not compliant because it did not submit its local content plan to the petroleum commission.".
+}
+WHERE
+{
+?x :plays-upstream-company-role ?r.
+NOT EXISTS{?x :has-submitted ?z}.
+}
+"""];
+
+#this rule checks whether a company is not compliant with the window of submission because, although it submitted the local content plan, it did so outside the window of submission.
+sh:rule[rdf:type sh:SPARQLRule; sh:order 1; sh:prefixes :PrefixesEmbeddedSPARQLRules;
+sh:construct """
+CONSTRUCT 
+{
+:NonCompliantCompany rdf:type owl:class.
+?x rdf:type :NonCompliantCompany;
+rdfs:comment "This oil company or service provider is not compliant because it did not submit the local content plan within the required window of submission.".
+}
+WHERE
+{
+?x :plays-upstream-company-role ?r.
+NOT EXISTS{?x rdf:type :NonCompliantCompany}
+?x :has-submitted ?z.
+?z :at-submission-time ?d.
+?w rdf:type :SubmissionWindowLCP.
+?w ti:hasIntervalStartDate ?wssd.
+?w ti:hasIntervalEndDate ?wsed.
+FILTER((?d<?wssd)||(?d>?wsed)).
+}
+"""];
+
+
+#If a company did submit the local content plan and it did so in the window of submission, for each company we calculate:
+# - the duration of incorporation (for how long it has been incorporated in Ghana prior the starting date of the window) 
+# - the allowable date of employment (Ghanaians are counted towards the quotas only if they cover their current roles for at least 6 months from the starting date of the window.
+
+sh:rule[rdf:type sh:SPARQLRule; sh:order 2; sh:prefixes :PrefixesEmbeddedSPARQLRules;
+sh:construct """
+CONSTRUCT 
+{
+?x :has-incorporation-duration ?di.
+?x :employment-allowable-date ?mbeb.
+}
+WHERE
+{
+?x :plays-upstream-company-role ?r.
+NOT EXISTS{?x rdf:type :NonCompliantCompany}
+?x :date-of-incorporation  ?dt.
+?w rdf:type :SubmissionWindowLCP.
+?w ti:hasIntervalStartDate ?wssd.
+BIND(?wssd-?dt AS ?di)
+BIND(?wssd-"P0Y6M"^^xsd:duration AS ?mbeb)
+}
+"""];
+
+
+#this SHACL rule counts the total number of management staff a contractor, subcontractor, licensee or allied entity a company CURRENTLY has.
+sh:rule[rdf:type sh:SPARQLRule; sh:order 3; sh:prefixes :PrefixesEmbeddedSPARQLRules;
+sh:construct """
+CONSTRUCT 
+{
+?x :has-total-management-staff ?manemp.
+}
+{
+SELECT ?x (count(distinct ?z) as ?manemp)
+WHERE
+{
+?x :plays-upstream-company-role ?r.
+?x :has-incorporation-duration ?di.
+NOT EXISTS{?x rdf:type :NonCompliantCompany}
+?z :has-employment-role ?a.
+?a :within-employment-context ?d.
+?d :with-company ?x.
+?a :with-role ?b.
+?b rdf:type :ManagementStaff.
+}
+GROUP BY ?x
+}
+""";
+];
+
+
+#this SHACL rule counts the number of Ghanaian management staff a contractor, subcontractor, licensee or other allied entity has employed.
+sh:rule[rdf:type sh:SPARQLRule; sh:order 3; sh:prefixes :PrefixesEmbeddedSPARQLRules;
+sh:construct """
+CONSTRUCT 
+{
+?x :has-total-gh-management-staff ?ghmanemp.
+?ghmanemp rdfs:comment "ghmanemp stands for ghanaian management employees.".
+}
+{
+SELECT ?x (count(distinct ?z) as ?ghmanemp)
+WHERE
+{
+?x :plays-upstream-company-role ?r.
+?x :has-incorporation-duration ?di.
+NOT EXISTS{?x rdf:type :NonCompliantCompany}
+?z :has-employment-role ?a.
+?a :within-employment-context ?d.
+?d :with-company ?x.
+?a :with-role ?b.
+?b rdf:type :ManagementStaff.
+?z wdt:P27 ?f.
+?f :with-nationality :ghanaian.
+?a :at-employment-role-time ?ter.
+?ter ti:hasIntervalStartDate ?tersd.
+?x :employment-allowable-date ?mbeb.
+FILTER(?tersd<?mbeb)
+}
+GROUP BY ?x
+}
+""";
+];
+
+
+#If the WHERE of the previous rule does not match individuals, the previous rule DOES NOT assign 0 to :has-total-ghanaian-management-staff-of; it simply does not create any :has-total-ghanaian-management-staff-of. The next rule is to manage the 0 value: if no :has-total-ghanaian-management-staff-of has been calculated, this rule sets it to 0.
+sh:rule[rdf:type sh:SPARQLRule; sh:order 4; sh:prefixes :PrefixesEmbeddedSPARQLRules;
+sh:construct """
+CONSTRUCT 
+{
+?x :has-total-gh-management-staff 0.
+?ghmanemp rdfs:comment "ghmanemp stands for ghanaian management employees.".
+}
+WHERE
+{
+?x :plays-upstream-company-role ?r.
+NOT EXISTS{?x rdf:type :NonCompliantCompany}
+NOT EXISTS{?x :has-total-gh-management-staff ?ghmanemp}
+}
+""";
+];
+
+
+#This SHACL rule checks whether a contractor, subcontractor, licensee or other allied entity has less than 70% of its management staff being Ghanaians within 10 or more years of its incorporation in ghana.
+sh:rule[rdf:type sh:SPARQLRule; sh:order 5; sh:prefixes :PrefixesEmbeddedSPARQLRules;
+sh:construct """
+CONSTRUCT 
+{
+?x rdf:type :NonCompliantCompany;
+rdfs:comment "has less than 70% of its management staff being Ghanaians".
+}
+WHERE
+{
+?x :plays-upstream-company-role ?r.
+?x :has-incorporation-duration ?di.
+NOT EXISTS{?x rdf:type :NonCompliantCompany}
+FILTER(?di >= "P10Y"^^xsd:duration).
+?x :has-total-management-staff ?manemp.
+?x :has-total-gh-management-staff ?ghmanemp.
+FILTER(?ghmanemp<(?manemp*0.7)).
+}
+""";
+];
+
+
+#This SHACL rule checks whether a contractor, subcontractor, licensee or other allied entity does not have at least 50% to 60% of its management staff being Ghanaians from 5 to 10 years of its incorporation in ghana.
+sh:rule[rdf:type sh:SPARQLRule; sh:order 5; sh:prefixes :PrefixesEmbeddedSPARQLRules;
+sh:construct """
+CONSTRUCT 
+{
+?x rdf:type :NonCompliantCompany;
+rdfs:comment "has less than 50% of its management staff being Ghanaians".
+}
+WHERE
+{
+?x :plays-upstream-company-role ?r.
+?x :has-incorporation-duration ?di.
+NOT EXISTS{?x rdf:type :NonCompliantCompany}
+FILTER((?di>= "P5Y"^^xsd:duration)&&(?di < "P10Y"^^xsd:duration)).
+?x :has-total-management-staff ?manemp.
+?x :has-total-gh-management-staff ?ghmanemp.
+FILTER(?ghmanemp<(?manemp*0.5)).
+}
+""";
+];
+
+#This SHACL rule checks whether a contractor, subcontractor, licensee or other allied entity does not have at least 30% of its management staff being Ghanaians within less than 5 years of its incorporation in ghana.
+sh:rule[rdf:type sh:SPARQLRule; sh:order 5; sh:prefixes :PrefixesEmbeddedSPARQLRules;
+sh:construct """
+CONSTRUCT 
+{
+?x rdf:type :NonCompliantCompany;
+rdfs:comment "has less than 30% of its management staff being Ghanaians".
+}
+WHERE
+{
+?x :plays-upstream-company-role ?r.
+?x :has-incorporation-duration ?di.
+NOT EXISTS{?x rdf:type :NonCompliantCompany}
+FILTER(?di < "P5Y"^^xsd:duration).
+?x :has-total-management-staff ?manemp.
+?x :has-total-gh-management-staff ?ghmanemp.
+FILTER(?ghmanemp<(?manemp*0.3)).
+}
+""";
+];
+
+
+
+
+sh:targetClass owl:Class
+].

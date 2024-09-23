@@ -1,0 +1,313 @@
+@prefix : <https://w3id.org/ontology/uslcp#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix wd: <http://www.wikidata.org/entity/>.
+@prefix wdt: <http://www.wikidata.org/prop/direct/>.
+@prefix ti: <http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#>.
+@prefix time: <http://www.w3.org/2006/time#>.
+
+@base <https://w3id.org/ontology/uslcpo#> .
+
+<https://w3id.org/ontology/uslcpo#> rdf:type owl:Ontology .
+
+
+###########################################################################################################
+#
+#    Basic individuals: companies, employees, and nationalities.
+#
+###########################################################################################################
+
+#IOCs and their number of years of incorporation
+:tgl rdf:type :InternationalOilCompany;
+:date-of-incorporation "2006-03-10T00:00:00Z"^^xsd:dateTime;
+rdfs:comment "tgl stands for Tullow Ghana Limited which is an IOC currently operating in Ghana as a contractor.".
+
+:egepl rdf:type :InternationalOilCompany;
+:date-of-incorporation "2016-04-14T00:00:00Z"^^xsd:dateTime;
+rdfs:comment " egepl stands for ENI Ghana Exploration And Production Limited which is also an IOC currently operating in Ghana as a contractor.".
+
+#employees.
+#eni employees.
+:kuukuAnim rdf:type :Employee.
+:livioRobaldo rdf:type :Employee.
+:leonardoDavinci rdf:type :Employee.
+:sheldonCooper rdf:type :Employee.
+
+#tullow employees.
+:kwameAnim rdf:type :Employee.
+:efuaFiankobea rdf:type :Employee.
+:yaaAdubea rdf:type :Employee.
+:adamWyner rdf:type :Employee.
+
+#nationalities.
+:ghanaian rdf:type wd:Q231002.
+:italian rdf:type wd:Q231002.
+:american rdf:type wd:Q231002.
+
+###########################################################################################################
+#
+#    TVC (value in time and context) individuals.
+#
+###########################################################################################################
+
+#Upstream company roles for IOCs (both egepl and tgl are contractors).
+:egepl :plays-upstream-company-role :eNIContractor.
+:eNIContractor rdf:type :UpstreamCompanyRolePeriod;
+:with-company-role :contractor;
+:at-contractor-role-time :eNIContractorPeriod.
+:eNIContractorPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2016-04-14T00:00:00Z"^^xsd:dateTime;
+ti:hasIntervalEndDate "2041-04-14T00:00:00Z"^^xsd:dateTime.
+
+:tgl :plays-upstream-company-role :tullowContractor.
+:tullowContractor rdf:type :UpstreamCompanyRolePeriod;
+:with-company-role :contractor;
+:at-contractor-role-time :tullowContractorPeriod.
+:tullowContractorPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2006-03-10T00:00:00Z"^^xsd:dateTime;
+ti:hasIntervalEndDate "2031-03-10T00:00:00Z"^^xsd:dateTime.
+
+#Employments.
+#eni employment.
+:kuukuAnim :has-employment :kuukuENIEmployment.
+:kuukuENIEmployment rdf:type :EmploymentPeriod;
+:with-company :egepl;
+:at-time-of-employment :kuukuENIEmploymentPeriod.
+:kuukuENIEmploymentPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2016-07-07T00:00:00Z"^^xsd:dateTime.
+
+:livioRobaldo :has-employment :livioENIEmployment.
+:livioENIEmployment rdf:type :EmploymentPeriod;
+:with-company :egepl;
+:at-time-of-employment :livioENIEmploymentPeriod.
+:livioENIEmploymentPeriod rdf:type ti:TimeInterval;
+
+ti:hasIntervalStartDate "2017-12-01T00:00:00Z"^^xsd:dateTime.
+
+:leonardoDavinci :has-employment :leonardoENIEmployment.
+:leonardoENIEmployment rdf:type :EmploymentPeriod;
+:with-company :egepl;
+:at-time-of-employment :leonardoENIEmploymentPeriod.
+:leonardoENIEmploymentPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2016-07-07T00:00:00Z"^^xsd:dateTime.
+
+:sheldonCooper :has-employment :sheldonENIEmployment.
+:sheldonENIEmployment rdf:type :EmploymentPeriod;
+:with-company :egepl;
+:at-time-of-employment :sheldonENIEmploymentPeriod.
+:sheldonENIEmploymentPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2016-07-07T00:00:00Z"^^xsd:dateTime.
+
+#tullow employment.
+:kwameAnim :has-employment :kwameTglEmployment.
+:kwameTglEmployment rdf:type :EmploymentPeriod;
+:with-company :tgl;
+:at-time-of-employment :kwameTglEmploymentPeriod.
+:kwameTglEmploymentPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2022-12-31T00:00:00Z"^^xsd:dateTime.
+
+:efuaFiankobea :has-employment :efuaTglEmployment.
+:efuaTglEmployment rdf:type :EmploymentPeriod;
+:with-company :tgl;
+:at-time-of-employment :efuaTglEmploymentPeriod.
+:efuaTglEmploymentPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2022-12-31T00:00:00Z"^^xsd:dateTime.
+
+:yaaAdubea :has-employment :yaaTglEmployment.
+:yaaTglEmployment rdf:type :EmploymentPeriod;
+:with-company :tgl;
+:at-time-of-employment :yaaTglEmploymentPeriod.
+:yaaTglEmploymentPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2022-12-31T00:00:00Z"^^xsd:dateTime.
+
+:adamWyner :has-employment :adamTglEmployment.
+:adamTglEmployment rdf:type :EmploymentPeriod;
+:with-company :tgl;
+:at-time-of-employment :adamTglEmploymentPeriod.
+:adamTglEmploymentPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2010-12-31T00:00:00Z"^^xsd:dateTime.
+
+#Employment roles.
+#eni employment roles.
+:kuukuAnim :has-employment-role :kuukuENIEmploymentRole.
+:kuukuENIEmploymentRole rdf:type :EmploymentRolePeriod;
+:with-role wd:Q623268;
+:within-employment-context :kuukuENIEmployment;
+:at-employment-role-time :kuukuENIEmploymentRolePeriod.
+
+:kuukuENIEmploymentRolePeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2016-07-07T00:00:00Z"^^xsd:dateTime;
+ti:hasIntervalEndDate "2017-06-06T00:00:00Z"^^xsd:dateTime.
+
+:kuukuAnim :has-employment-role :kuuku2ENIEmploymentRole.
+:kuuku2ENIEmploymentRole rdf:type :EmploymentRolePeriod;
+:with-role wd:Q623279;
+:within-employment-context :kuukuENIEmployment;
+:at-employment-role-time :kuuku2ENIEmploymentRolePeriod.
+
+:kuuku2ENIEmploymentRolePeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2017-07-07T00:00:00Z"^^xsd:dateTime.
+
+:livioRobaldo :has-employment-role :livioENIEmploymentRole.
+:livioENIEmploymentRole rdf:type :EmploymentRolePeriod;
+:with-role wd:Q484876;
+:within-employment-context :livioENIEmployment;
+:at-employment-role-time :livioENIEmploymentRolePeriod.
+
+:livioENIEmploymentRolePeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2017-12-01T00:00:00Z"^^xsd:dateTime.
+
+:leonardoDavinci :has-employment-role :leonardoENIEmploymentRole.
+:leonardoENIEmploymentRole rdf:type :EmploymentRolePeriod;
+:with-role  wd:Q1072339;
+:within-employment-context :leonardoENIEmployment;
+:at-employment-role-time :leonardoENIEmploymentRolePeriod.
+
+:leonardoENIEmploymentRolePeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2016-07-07T00:00:00Z"^^xsd:dateTime.
+
+:sheldonCooper :has-employment-role :sheldonENIEmploymentRole.
+:sheldonENIEmploymentRole rdf:type :EmploymentRolePeriod;
+:with-role wd:Q1210069;
+:within-employment-context :sheldonENIEmployment;
+:at-employment-role-time :sheldonENIEmploymentRolePeriod.
+
+:sheldonENIEmploymentRolePeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2016-07-07T00:00:00Z"^^xsd:dateTime.
+
+#tullow employment role.
+:kwameAnim :has-employment-role :kwameTglEmploymentRole.
+:kwameTglEmploymentRole rdf:type :EmploymentRolePeriod;
+:with-role wd:Q484876;
+:within-employment-context :kwameTglEmployment;
+:at-employment-role-time :kwameTglEmploymentRolePeriod.
+
+:kwameTglEmploymentRolePeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2022-12-31T00:00:00Z"^^xsd:dateTime.
+
+:efuaFiankobea :has-employment-role :efuaTglEmploymentRole.
+:efuaTglEmploymentRole rdf:type :EmploymentRolePeriod;
+:with-role wd:Q623279;
+:within-employment-context :efuaTglEmployment;
+:at-employment-role-time :efuaTglEmploymentRolePeriod.
+
+:efuaTglEmploymentRolePeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2022-12-31T00:00:00Z"^^xsd:dateTime.
+
+:yaaAdubea :has-employment-role :yaaTglEmploymentRole.
+:yaaTglEmploymentRole rdf:type :EmploymentRolePeriod;
+:with-role wd:Q623268;
+:within-employment-context :yaaTglEmployment;
+:at-employment-role-time :yaaTglEmploymentRolePeriod.
+
+:yaaTglEmploymentRolePeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2022-12-31T00:00:00Z"^^xsd:dateTime.
+
+:adamWyner :has-employment-role :adamTglEmploymentRole.
+:adamTglEmploymentRole rdf:type :EmploymentRolePeriod;
+:with-role wd:Q1072339;
+:within-employment-context :adamTglEmployment;
+:at-employment-role-time :adamTglEmploymentRolePeriod.
+
+:adamTglEmploymentRolePeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "2010-12-31T00:00:00Z"^^xsd:dateTime.
+
+#value in time and context for nationality.
+:kuukuAnim wdt:P27 :kuukuCitizenship.
+:kuukuCitizenship rdf:type :NationalityPeriod;
+:with-nationality :ghanaian;
+:at-nationality-time :kuukuNationalityPeriod.
+
+:kuukuNationalityPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "1999-05-19T00:00:00Z"^^xsd:dateTime.
+
+:livioRobaldo wdt:P27 :livioCitizenship.
+:livioCitizenship rdf:type :NationalityPeriod;
+:with-nationality :italian;
+:at-nationality-time :livioNationalityPeriod.
+
+:livioNationalityPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "1979-06-23T00:00:00Z"^^xsd:dateTime.
+
+:leonardoDavinci wdt:P27 :leonardoCitizenship.
+:leonardoCitizenship rdf:type :NationalityPeriod;
+:NationalityPeriod :italian;
+:at-nationality-time :leonardoNationalityPeriod.
+
+:leonardoNationalityPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "1977-07-07T00:00:00Z"^^xsd:dateTime.
+
+:sheldonCooper wdt:P27 :sheldonCitizenship.
+:sheldonCitizenship rdf:type :NationalityPeriod;
+:with-nationality :american;
+:at-nationality-time :sheldonNationalityPeriod.
+
+:sheldonNationalityPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "1980-02-26T00:00:00Z"^^xsd:dateTime.
+
+:kwameAnim wdt:P27 :kwameCitizenship.
+:kwameCitizenship rdf:type :NationalityPeriod;
+:with-nationality :ghanaian;
+:at-nationality-time :kwameNationalityPeriod.
+
+:kwameNationalityPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "1965-04-25T00:00:00Z"^^xsd:dateTime.
+
+:efuaFiankobea wdt:P27 :efuaCitizenship.
+:efuaCitizenship rdf:type :NationalityPeriod;
+:with-nationality  :ghanaian;
+:at-nationality-time :efuaNationalityPeriod.
+
+:efuaNationalityPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "1970-07-03T00:00:00Z"^^xsd:dateTime.
+
+:yaaAdubea wdt:P27 :yaaCitizenship.
+:yaaCitizenship rdf:type :NationalityPeriod;
+:with-nationality :ghanaian;
+:at-nationality-time :yaaNationalityPeriod.
+
+:yaaNationalityPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "1996-10-31T00:00:00Z"^^xsd:dateTime.
+
+:adamWyner wdt:P27 :adamCitizenship.
+:adamCitizenship rdf:type :NationalityPeriod;
+:with-nationality :american;
+:at-nationality-time :adamNationalityPeriod.
+
+:adamNationalityPeriod rdf:type ti:TimeInterval;
+ti:hasIntervalStartDate "1966-06-06T00:00:00Z"^^xsd:dateTime.
+
+###########################################################################################################
+#
+#    Local Content Plan submission individuals.
+#
+###########################################################################################################
+
+:sdalcp23 rdf:type :SubmissionWindowLCP;
+time:generalYear "2023"^^xsd:gYear;
+ti:hasIntervalStartDate "2023-01-01T00:00:00Z"^^xsd:dateTime;
+ti:hasIntervalEndDate "2023-02-28T00:00:00Z"^^xsd:dateTime;
+rdfs:comment "sdalcp23 stands for submission deadline for annual local content plan for 2023 which is the time window within which contractors, subcontractors, licensee and other allied entity can submit their annual local content plan.".
+
+#six months employment threshold for 2023.
+:bed23 rdf:type :SixMonthsThresholdOfEmployment;
+time:generalYear "2023"^^xsd:gYear;
+rdfs:comment "bed23 stands for Borderline employment date".
+
+#Submission of annual local content plan of IOC :egepl
+:ealcp23 rdf:type :AnnualLocalContentPlan;
+rdfs:comment "ealcp23 stands for ENI annual local content plan 2023 which is eni's annual local content plan submitted for 2023.".
+:egepl :has-submitted :ealcp23.
+:egepl :has-submitted-to wd:Q85793009.
+:ealcp23 :at-submission-time "2023-02-01T00:00:00Z"^^xsd:dateTime.
+
+#Submission of annual local content plan of IOC :tgl
+:talcp23 rdf:type :AnnualLocalContentPlan;
+rdfs:comment "talcp23 stands for tullow annual local content plan 2023 which is tullow's annual local content plan submitted for 2023.".
+:tgl :has-submitted :talcp23.
+:tgl :has-submitted-to wd:Q85793009.
+:talcp23 :at-submission-time "2023-02-10T00:00:00Z"^^xsd:dateTime.
+
+

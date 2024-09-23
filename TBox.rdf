@@ -1,0 +1,249 @@
+@prefix : <https://w3id.org/ontology/uslcp#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix lkif-legal-action: <http://www.estrellaproject.org/lkif-core/legal-action.owl#>.
+@prefix lkif-role: <http://www.estrellaproject.org/lkif-core/role.owl#>.
+@prefix wd: <http://www.wikidata.org/entity/>.
+@prefix wdt: <http://www.wikidata.org/prop/direct/>.
+@prefix tvc: <http://www.essepuntato.it/2012/04/tvc/#>.
+@prefix ti: <http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#>.
+@prefix time: <http://www.w3.org/2006/time#>.
+
+@base <https://w3id.org/ontology/uslcpo#> .
+
+<https://w3id.org/ontology/uslcpo#> rdf:type owl:Ontology .
+
+
+###########################################################################################################
+#
+#	Classes and individuals to describe the entities operating in the oil and gas domain. 
+#	Classes are subclasses of those in http://www.estrellaproject.org/lkif-core/legal-action.owl#
+#	Some relevant concepts are imported from Wikidata, e.g., the individual "Petroleum Commission" 
+#	(https://www.wikidata.org/wiki/Q85793009).
+#
+###########################################################################################################
+
+#disjoint relationship between the super classes.
+lkif-legal-action:Public_Body owl:disjointWith lkif-legal-action:Company, :Department, :Committee, lkif-legal-action:Natural_Person, wd:Q231002, lkif-role:Role.
+lkif-legal-action:Company owl:disjointWith :Department, :Committee, lkif-legal-action:Natural_Person, wd:Q231002, lkif-role:Role.
+:Department owl:disjointWith :Committee, lkif-legal-action:Natural_Person, wd:Q231002, lkif-role:Role.
+:Committee owl:disjointWith lkif-legal-action:Natural_Person, wd:Q231002, lkif-role:Role.
+lkif-legal-action:Natural_Person owl:disjointWith wd:Q231002, lkif-role:Role.
+wd:Q231002 owl:disjointWith lkif-role:Role.
+
+###########################################################################################################
+
+
+:OilCompany rdf:type owl:Class;
+	rdfs:subClassOf lkif-legal-action:Company;
+	rdfs:comment "the set of all companies that undertake E&P activities I.E., they undertake exploration and production activities.".
+
+:ServiceProvider rdf:type owl:Class;
+	rdfs:subClassOf [rdf:type owl:Class; owl:unionOf (lkif-legal-action:Company lkif-legal-action:Natural_Person)];
+	rdfs:comment "the set of companies or individuals that have a petroleum subcontract or any other contract to provide needed services to contractors, licensees or even other subcontractors.".
+
+:nonIndigenousGhanaianCompany rdf:type owl:Class;
+	rdfs:subClassOf lkif-legal-action:Company;
+	owl:disjointWith :IndigenousGhanaianCompany, :NationalOilCompany;
+	rdfs:comment "the set of all companies which are not IndigenousGhanaianCompany nor National oil company.".
+			
+:InternationalOilCompany rdf:type owl:Class;
+	rdfs:subClassOf :OilCompany, :nonIndigenousGhanaianCompany;
+	rdfs:comment "the set of all large multinational corporations which are primarily involved in the exploration, production and sale of petroleum. they have quite a massive global presence and operate accross numerous countries and regions examples include, Tullow oil, ENI, etc.".
+			
+:RelevantAgency rdf:type owl:Class;
+	rdfs:subClassOf lkif-legal-action:Public_Body, wd:Q327333;
+	owl:disjointWith :OilCompany, :IndigenousGhanaianCompany, :nonIndigenousGhanaianCompany;
+	rdfs:comment "the set of all government agency under which competence petroleum activities are undertaking; the most important relevant agency in the upstream industry is the Petroleum Commission (Q85793009)".
+
+#relevant governmental agencies.
+wd:Q85793009 rdf:type :RelevantAgency;
+rdfs:comment "wd:Q85793009  is the petroleum commission which is the main regulator of the upstream petroleum industry in Ghana.".
+
+:Employee rdf:type owl:Class;
+	rdfs:subClassOf lkif-legal-action:Natural_Person;
+	owl:equivalentClass wd:Q703534;
+	rdfs:comment "the set of persons employed by public bodies and companies".
+
+wd:Q231002 rdf:type owl:Class;
+rdfs:comment "the set of all nationalities natural persons belong to".
+
+
+###########################################################################################################
+#
+#	Property ":number-of-years-incorporated", defined for ServiceProviders and OilCompanies
+#
+###########################################################################################################
+
+:date-of-incorporation rdf:type owl:DatatypeProperty;
+rdfs:domain [rdf:type owl:Class; owl:unionOf (:ServiceProvider :OilCompany)];
+rdfs:domain lkif-legal-action:Company;
+rdfs:range xsd:dateTime;
+rdfs:comment "this property specifies how many years an oil company or a service provider has been incorporated in Ghana. according to LI 2204 as ammended, depending on the number of years an oil company or a service provider has been incorporated in Ghana, it assumes certain responsibilities. for example the percentage of ghanaian employees it ought to employ.".
+
+
+###########################################################################################################
+#
+#    Classes to describe the roles operating in the oil and gas domain (subclasses of lkif-role:Role)
+#
+###########################################################################################################
+
+:UpstreamCompanyRole rdf:type owl:Class;		
+	rdfs:subClassOf lkif-role:Role;
+	rdfs:comment"all the roles played by companies in the upstream sector.".
+
+:contractor rdf:type :UpstreamCompanyRole;
+	rdfs:comment "a set of oil companies that have entered into a petroleum agreement with Ghana to undertake petroleum exploration and production activities under Act 919".
+
+:ManagementStaff rdf:type owl:Class;
+	rdfs:subClassOf lkif-role:Role;
+	rdfs:comment "a set of employees within an organization who are responsible for overseeing and directing the work of other employees. They are typically responsible for planning, organizing, coordinating, and controlling the resources of an organization to achieve its goals and objectives. Management staff can hold a variety of different roles within an organization, including: Executive management: This includes positions such as CEO, COO, and CFO, who are responsible for the overall direction and strategy of the organization. Middle management: These are managers who oversee specific departments or functions within an organization, such as marketing, operations, or human resources. Front-line management: These managers supervise employees who are directly involved in the production or delivery of goods or services, such as supervisors in a manufacturing plant or customer service team leaders".
+
+wd:Q484876 rdf:type :ManagementStaff ;
+rdfs:comment "the wiki data individual for CEO.".
+
+wd:Q623279 rdf:type :ManagementStaff ;
+rdfs:comment "the wiki data individual for COO.".
+
+wd:Q623268 rdf:type :ManagementStaff ;
+rdfs:comment "the wiki data individual for CFO.".
+
+wd:Q1072339 rdf:type :ManagementStaff ;
+rdfs:comment "the wiki data individual for CMO.".
+
+wd:Q1210069 rdf:type :ManagementStaff ;
+rdfs:comment "the wiki data individual for general manager.".
+###########################################################################################################
+
+#
+#    TVC (value in time and context) subclasses
+#
+###########################################################################################################
+
+:EmploymentPeriod rdf:type owl:Class;
+	rdfs:subClassOf tvc:ValueInTime ;
+	rdfs:comment"this classifies all the value in time individuals for the employment periods.".
+
+:EmploymentRolePeriod rdf:type owl:Class;
+	rdfs:subClassOf tvc:ValueInTime ;
+	rdfs:comment"this classifies all the value in time individuals for the employment role periods.".
+
+:UpstreamCompanyRolePeriod rdf:type owl:Class;
+	rdfs:subClassOf tvc:ValueInTime ;
+	rdfs:comment"this classifies all the value in time individuals for the upstream company role periods.".
+
+:NationalityPeriod rdf:type owl:Class;
+	rdfs:subClassOf tvc:ValueInTime ;
+	rdfs:comment"this classifies all the value in time individuals for the nationality periods.".
+
+
+
+
+
+
+###########################################################################################################
+#
+#    TVC (value in time and context) subproperties
+#
+###########################################################################################################
+
+ti:TimeInterval rdfs:subClassOf time:Interval.
+ti:hasIntervalStartDate rdfs:range xsd:dateTime.
+ti:hasIntervalEndDate rdfs:range xsd:dateTime.
+
+:plays-upstream-company-role rdfs:subPropertyOf tvc:hasValue;
+rdfs:domain [rdf:type owl:Class; owl:unionOf (:OilCompany :ServiceProvider)];
+rdfs:range :UpstreamCompanyRolePeriod;
+	rdfs:comment "this property associates oil companies or service providers to the roles which they play within a specific period and context.".
+
+:has-employment-role rdfs:subPropertyOf tvc:hasValue;
+rdfs:domain :Employee;
+rdfs:comment "this is to demonstrate that has employment role is a sub-property of has value which indicate that every employee has a certain employment role within a particular context and timeframe .".
+
+:has-employment rdfs:subPropertyOf tvc:hasValue;
+rdfs:domain :Employee;
+rdfs:comment "this is a subproperty which specify that an employee is being employed by a company within a particular timeframe ".
+
+wdt:P27 rdfs:subPropertyOf tvc:hasValue;
+rdfs:domain :Employee;
+rdfs:comment "This is to show that an employee has the value nationality.".
+
+:within-employment-context rdfs:subPropertyOf tvc:withinContext;
+rdfs:comment "this specifies the employment period and context in which the employee plays his or her employment role.".
+
+:at-time-of-employment rdfs:subPropertyOf tvc:atTime;
+rdfs:range ti:TimeInterval;
+rdfs:comment "this specifies the timeframe within which the employee is employed. (the start date and or the the end date)".
+
+:at-nationality-time rdfs:subPropertyOf tvc:atTime;
+rdfs:range ti:TimeInterval;
+rdfs:comment "this specifies the timeframe within which the employee has his or her nationality.". 
+
+:at-contractor-role-time rdfs:subPropertyOf tvc:atTime;
+rdfs:range ti:TimeInterval;
+rdfs:comment "this specifies the timeframe within which a company plays its upstream company role.".
+
+:at-employment-role-time rdfs:subPropertyOf tvc:atTime;
+rdfs:range ti:TimeInterval;
+rdfs:comment "this specifies the timeframe within which the employee holds his or her employment role".
+
+:with-company-role rdfs:subPropertyOf :withValue;
+rdfs:domain :UpstreamCompanyRolePeriod;
+rdfs:range :UpstreamCompanyRole;
+rdfs:comment "this specifies that a particular upstream company role period has a certain upstream company role.".
+
+:with-company rdfs:subPropertyOf :withValue;
+rdfs:domain :EmploymentPeriod;
+rdfs:range :InternationalOilCompany;
+rdfs:comment "this specifies that a particular employment period has a certain upstream company .".
+
+:with-role rdfs:subPropertyOf :withValue;
+rdfs:domain :EmploymentRolePeriod;
+rdfs:range :ManagementStaff;
+rdfs:comment "this specifies that a particular employment role period has a certain management staff role.".
+
+:with-nationality rdfs:subPropertyOf tvc:withValue;
+rdfs:domain :NationalityPeriod;
+rdfs:range wd:Q231002;
+rdfs:comment "this specifies that a nationality period is related to a certain nationality.".
+
+
+
+###########################################################################################################
+#
+#    Classes and properties for the submission of the Local Content Plan (LCP).
+#
+###########################################################################################################
+
+:AnnualLocalContentPlan rdf:type owl:Class;
+rdfs:comment "the annual local content plan is a document that oil companies must prepare every year. it captures how they plan to adhir to the local content requirement".
+
+:has-submitted rdf:type owl:ObjectProperty ;
+rdfs:domain [rdf:type owl:Class; owl:unionOf (:OilCompany :ServiceProvider)];
+rdfs:range :AnnualLocalContentPlan;
+rdfs:comment "this property specifies the relationship between contractors, subcontractors, licensees and other allied entities and their submission of their local content plans every year".
+
+:has-submitted-to rdf:type owl:ObjectProperty ;
+rdfs:domain [rdf:type owl:Class; owl:unionOf (:OilCompany :ServiceProvider)];
+rdfs:range :RelevantAgency;
+rdfs:comment "This property shows that oil companies or service providers have made a submission to a relevant agency.".
+
+:at-submission-time rdf:type owl:DatatypeProperty;
+rdfs:domain :AnnualLocalContentPlan;
+rdfs:range xsd:dateTime;
+rdfs:comment "this specifies when the annual local content plan is submitted.".
+
+:SubmissionDeadlineWindow rdf:type owl:Class;
+rdfs:subClassOf ti:TimeInterval;
+rdfs:comment "this is to specify the time interval or time window for submitting documents to relevant agencies".
+
+:SubmissionWindowLCP rdf:type owl:Class;
+rdfs:subClassOf :SubmissionDeadlineWindow;
+rdfs:comment "this stipulates the time window within which all annual local content plan must be submitted.".
+
+:SixMonthsThresholdOfEmployment rdf:type owl:Class;
+rdfs:subClassOf time:Instant;
+rdfs:comment "this class holds the six months threshold below which a company cannot employ its Ghanaian employees for the year under review".
+

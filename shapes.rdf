@@ -1,0 +1,122 @@
+@prefix : <https://w3id.org/ontology/uslcp#>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix lkif-legal-action: <http://www.estrellaproject.org/lkif-core/legal-action.owl#>.
+@prefix wd: <http://www.wikidata.org/entity/>.
+@prefix wdt: <http://www.wikidata.org/prop/direct/>.
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+@prefix tvc: <http://www.essepuntato.it/2012/04/tvc/#>.
+@prefix ti: <http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#>.
+@prefix time: <http://www.w3.org/2006/time#>.
+
+@base <https://w3id.org/ontology/uslcpo#> .
+
+<https://w3id.org/ontology/uslcpo#> rdf:type owl:Ontology .
+
+#defines all prefixes used in at least one sh:sparql below.
+:PrefixesEmbeddedSHsparql sh:declare 
+	[sh:prefix"";sh:namespace"https://w3id.org/ontology/uslcp#"^^xsd:anyURI],
+	[sh:prefix"rdf";sh:namespace"http://www.w3.org/1999/02/22-rdf-syntax-ns#"^^xsd:anyURI],
+	[sh:prefix"rdfs";sh:namespace"http://www.w3.org/2000/01/rdf-schema#"^^xsd:anyURI],
+	[sh:prefix"owl";sh:namespace"http://www.w3.org/2002/07/owl#"^^xsd:anyURI],
+	[sh:prefix"xsd";sh:namespace"http://www.w3.org/2001/XMLSchema#"^^xsd:anyURI],
+	[sh:prefix"lkif-legal-action";sh:namespace"http://www.estrellaproject.org/lkif-core/legal-action.owl#"^^xsd:anyURI],
+	[sh:prefix"wd";sh:namespace"http://www.wikidata.org/entity/"^^xsd:anyURI],
+	[sh:prefix"wdt";sh:namespace"http://www.wikidata.org/prop/direct/"^^xsd:anyURI],
+	[sh:prefix"tvc";sh:namespace"http://www.essepuntato.it/2012/04/tvc/#"^^xsd:anyURI],
+	[sh:prefix"ti";sh:namespace"http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#"^^xsd:anyURI],
+	[sh:prefix"time";sh:namespace"http://www.w3.org/2006/time#"^^xsd:anyURI].
+
+###########################################################################################################
+#
+#this SHACL shape checks that the subjects for the property :date-of-incorporation are companies even though the subclasses of service provider is either company or natural person.
+:CheckSubjectOfDateOfIncorporationAsCompany rdf:type sh:NodeShape;
+sh:sparql[sh:prefixes :PrefixesEmbeddedSHsparql;
+sh:message "Invalid '{$this}': it must be either a ServiceProvider or an OilCompany." ;
+sh:select """SELECT $this
+WHERE
+{
+NOT EXISTS{{$this rdf:type/rdfs:subClassOf* :ServiceProvider.}UNION{$this rdf:type/rdfs:subClassOf* :OilCompany.}}
+}"""
+];
+sh:sparql[sh:prefixes :PrefixesEmbeddedSHsparql;
+sh:message "Invalid '{$this}': it must be a lkif-legal-action:Company." ;
+sh:select """SELECT $this
+WHERE
+{
+NOT EXISTS{$this rdf:type/rdfs:subClassOf* lkif-legal-action:Company}.
+}"""
+];
+sh:targetSubjectsOf :date-of-incorporation.
+
+
+#this SHACL shape check that all ranges of ti:hasIntervalStartDate are xsd:dateTime datatypes.
+:CheckTiHasIntervalStartDateIsXSDdateTime rdf:type sh:NodeShape;
+	sh:property[
+		sh:datatype xsd:dateTime;
+		sh:message "Invalid datatype: it must be xsd:dateTime"];
+sh:targetObjectsOf ti:hasIntervalStartDate.
+
+#this SHACL shape check that all ranges of ti:hasIntervalEndDate are xsd:dateTime datatypes.
+:CheckTiHasIntervalEndDateIsXSDdateTime rdf:type sh:NodeShape;
+	sh:property[
+		sh:datatype xsd:dateTime;
+		sh:message "Invalid datatype: it must be xsd:dateTime"];
+sh:targetObjectsOf ti:hasIntervalEndDate.
+
+#this SHACL shape constrain all starting dates of the ti:TimeInterval to come before the end date of the ti:TimeInterval.
+:CheckDatesTIInterval rdf:type sh:NodeShape; sh:sparql[sh:prefixes :PrefixesEmbeddedSHsparql;
+sh:message "Interval '{$this}' is NOT valid: the starting date {?sd} comes after the end date {?ed}" ;
+sh:select """SELECT $this ?sd ?ed
+WHERE
+{
+$this ti:hasIntervalStartDate ?sd.
+$this ti:hasIntervalEndDate ?ed.
+FILTER(?sd>?ed).
+}"""
+];
+sh:targetClass ti:TimeInterval.
+
+#this checks whether the submission deadlines have only one year associated to them.
+:CheckWhetherGeneralYearHasOnlyOneYear rdf:type sh:NodeShape;
+	sh:property[
+		sh:path time:generalYear;
+		sh:datatype xsd:gYear;
+		sh:minCount 1;
+		sh:maxCount 1;
+		sh:message "Invalid: it must have exactly one year associated to it"];
+sh:targetClass :WindowOfSubmissionForAnnualLocalContentPlan.
+
+
+#this SHACL shape constrain all starting dates of the window to submit local content plan to come before the end date of the window to submit local content plan.
+:CheckDatesLCPWindowToSubmit rdf:type sh:NodeShape; sh:sparql[sh:prefixes :PrefixesEmbeddedSHsparql;
+sh:message "The window for submission of annual LCP '{$this}' is NOT valid: the starting date {?sd} comes after the end date {?ed}" ;
+sh:select """SELECT $this ?sd ?ed
+WHERE
+{
+$this ti:hasIntervalStartDate ?sd.
+$this ti:hasIntervalEndDate ?ed.
+FILTER(?sd>?ed).
+}"""
+];
+sh:targetClass :WindowOfSubmissionForAnnualLocalContentPlan.
+
+
+#this shape constrains the employment role period within the employment period.
+:CheckEmploymentRolePeriodNotBeforeEmploymentPeriod rdf:type sh:NodeShape; sh:sparql[sh:prefixes :PrefixesEmbeddedSHsparql;
+sh:message "{$this} is invalid: the employment role period must be within the employment period" ;
+sh:select """SELECT $this ?erts ?toes
+WHERE
+{
+$this :at-employment-role-time ?ert.
+$this :within-employment-context ?c.
+?ert ti:hasIntervalStartDate ?erts.
+?c :at-time-of-employment ?toe.
+?toe ti:hasIntervalStartDate ?toes.
+FILTER(?erts<?toes).
+}"""
+];
+sh:targetObjectsOf :has-employment-role.
+
